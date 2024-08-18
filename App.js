@@ -1,81 +1,125 @@
-import * as React from 'react';
-import { Button, Text, View, Image } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import * as React from "react";
+import { Button, Text, View } from "react-native";
+import { NavigationContainer, useRoute } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-//Tampilan
+// Tampilan
 import HomeScreen from "./page/home";
-import LokasiScrean from "./page/lokasi";
-import LaporanScrean from "./page/lapor";
+import LokasiScreen from "./page/lokasi";
+import LaporanScreen from "./page/lapor";
+import ProfileScreen from "./page/profile";
+import LoginScreen from "./page/login";
 
-function ProfileScrean({ navigation }) {
+const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+
+function MainDrawer() {
+  const route = useRoute();
+
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Profile</Text>
-      <Button title="Go to Home" onPress={() => navigation.navigate("Home")} />
-    </View>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+
+          if (route.name === "Home") {
+            iconName = focused ? "home" : "home-outline";
+          } else if (route.name === "Lokasi") {
+            iconName = focused ? "map" : "map-outline";
+          } else if (route.name === "Laporan") {
+            iconName = focused ? "book" : "book-outline";
+          } else if (route.name === "Profile") {
+            iconName = focused ? "person" : "person-outline";
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: "#ae0001",
+        tabBarInactiveTintColor: "gray",
+      })}
+    >
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ headerShown: false }}
+        initialParams={{ lastLat: route.params?.lastLat }}
+      />
+      <Tab.Screen
+        name="Laporan"
+        component={LaporanScreen}
+        initialParams={{
+          lastLat: route.params?.lastLat,
+          lastLon: route.params?.lastLon,
+          lastStb: route.params?.lastStb,
+        }}
+        options={{
+          headerStyle: { backgroundColor: "#ae0001" },
+          headerTintColor: "#fff",
+          headerTitleStyle: { fontWeight: "bold" },
+        }}
+      />
+      <Tab.Screen
+        name="Lokasi"
+        component={LokasiScreen}
+        initialParams={{
+          lastId_instansi: route.params?.lastId_instansi,
+          lastNamainstansi: route.params?.lastNamainstansi,
+          lastLat: route.params?.lastLat,
+          lastLon: route.params?.lastLon,
+        }}
+        options={{
+          headerStyle: { backgroundColor: "#ae0001" },
+          headerTintColor: "#fff",
+          headerTitleStyle: { fontWeight: "bold" },
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        initialParams={{
+          lastData: route.params?.lastData,
+          lastStb: route.params?.lastStb,
+          lastId_instansi: route.params?.lastId_instansi,
+        }}
+        options={{
+          headerStyle: { backgroundColor: "#ae0001" },
+          headerTintColor: "#fff",
+          headerTitleStyle: { fontWeight: "bold" },
+        }}
+      />
+    </Tab.Navigator>
   );
 }
 
-const Tab = createBottomTabNavigator();
-
-export default function App() {
+function App() {
   return (
     <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen
-          name="Home"
-          component={HomeScreen}
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{
+            headerStyle: { backgroundColor: "#ae0001" },
+            headerTintColor: "#fff",
+            headerTitleStyle: { fontWeight: "bold" },
+            title: 'APLIKASI PELAPORAN KKL'
+          }}
+        />
+        <Stack.Screen
+          name="MainDrawer"
+          component={MainDrawer}
           options={{
             headerShown: false,
-            tabBarIcon: ({}) => (
-              <Image
-                source={require("./assets/icons/home.png")}
-                style={{ width: 20, height: 20 }}
-              />
-            ),
           }}
         />
-        <Tab.Screen
-          name="Laporan"
-          component={LaporanScrean}
-          options={{
-            // headerShown: false,
-            tabBarIcon: ({}) => (
-              <Image
-                source={require("./assets/icons/laporan.png")}
-                style={{ width: 20, height: 20 }}
-              />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Lokasi"
-          component={LokasiScrean}
-          options={{
-            // headerShown: false,
-            tabBarIcon: ({}) => (
-              <Image
-                source={require("./assets/icons/lokasi.png")}
-                style={{ width: 20, height: 20 }}
-              />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Profile"
-          component={ProfileScrean}
-          options={{
-            // headerShown: false,
-            tabBarIcon: ({}) => (
-              <Image
-                source={require("./assets/icons/user.png")}
-                style={{ width: 20, height: 20 }}
-              />
-            ),
-          }}
-        />
-      </Tab.Navigator>
+        <Stack.Screen name="Laporan" component={LaporanScreen} />
+        <Stack.Screen name="Lokasi" component={LokasiScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
+
+export default App;

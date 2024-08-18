@@ -1,62 +1,68 @@
-import { StyleSheet, Text, View, Button, Dimensions, Image, ScrollView } from 'react-native'
-import React from 'react'
+import React from "react";
+import { StyleSheet, Text, View, Image } from "react-native";
 
 function HomeScreen({ navigation }) {
-  const { height, width } = Dimensions.get("window");
   return (
-    <View style={{ flex: 1 }}>
-      <View
-        style={{
-          height: 250,
-          width: 360,
-          backgroundColor: "red",
-          marginBottom: 10,
-        }}
-      >
+    <View style={styles.container}>
+      <View style={styles.header}>
         <Image
           source={require("../../assets/bgudipa.png")}
-          style={{ height: 250, width: 360, backgroundColor: "red" }}
+          style={styles.headerImage}
         />
       </View>
-      <ScrollView horizontal>
-        <View style={{ flexDirection: "row" }}>
-          <View style={styles.card}>
-            <Text style={{ color: "green", fontSize: 16 }}>Hadir</Text>
-          </View>
-          <View style={styles.card}>
-            <Text style={{ color: "red", fontSize: 16 }}> Tidak Hadir</Text>
-          </View>
-          <View style={styles.card}>
-            <Text>Laporan</Text>
-          </View>
-        </View>
-      </ScrollView>
-      <Button
-        title="Go to Settings"
-        onPress={() => navigation.navigate("Settings")}
-      />
+      <View style={styles.logoContainer}>
+        <Image
+          source={require("../../assets/undipa.png")}
+          style={styles.logo}
+        />
+      </View>
+      <View style={styles.textContainer}>
+        <Text style={styles.appTitle}>APLIKASI KKL</Text>
+        <Text style={styles.universityName}>UNIVERSITAS DIPA MAKASSAR</Text>
+      </View>
     </View>
   );
 }
 
 export default HomeScreen;
+
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    marginHorizontal: 5,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    width: 150,
-    height: 180,
-    justifyContent: 'center',
-    alignItems: 'center',
+  container: {flex: 1,
+    backgroundColor: "#f5f5f5",
+    alignItems: "center", 
+  },
+  header: {
+    height: 250,
+    backgroundColor: "red",
+    width: "100%",
+    marginBottom: 10,
+  },
+  headerImage: {
+    height: "100%",
+    width: "100%",
+    resizeMode: "cover", // Membuat gambar header responsif
+  },
+  logoContainer: {
+    alignItems: "center", // Mengatur logo ke tengah secara horizontal
+    marginBottom: 20,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    resizeMode: "contain", // Membuat gambar logo responsif
+  },
+  textContainer: {
+    alignItems: "center", // Mengatur teks ke tengah secara horizontal
+  },
+  appTitle: {
+    fontSize: 24,
+    fontWeight: "bold", // Membuat teks "APLIKASI KKL" bold
+    textAlign: "center", // Mengatur teks ke tengah
+    marginBottom: 5,
+  },
+  universityName: {
+    fontSize: 18,
+    fontWeight: "bold", // Membuat teks "UNIVERSITAS DIPA MAKASSAR" bold
+    textAlign: "center", // Mengatur teks ke tengah
   },
 });
