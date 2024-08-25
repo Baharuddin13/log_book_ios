@@ -16,7 +16,7 @@ import * as SecureStore from "expo-secure-store";
 export default function LaporanScreen({ route }) {
   const lastLat = route.params?.lastLat;
   const lastLon = route.params?.lastLon;
-  const lastStb = route.params?.lastStb;
+  const lastStb = route.params?.lastStb; // NIM yang login
 
   const [reports, setReports] = useState([]);
   const [startTime, setStartTime] = useState("");
@@ -34,13 +34,22 @@ export default function LaporanScreen({ route }) {
 
   const fetchReports = async () => {
     try {
+      console.log("Fetching reports for NIM:", lastStb);
+
+      // Pastikan endpoint API memfilter berdasarkan nim
       const response = await axios.get(
-        "https://campa-bima.online/APIDP/lapor-om"
+        `https://campa-bima.online/APIDP/lapor-om?nim=${lastStb}`
       );
-      const fetchedReports = response.data.data.map((item) => ({
-        id: item.id,
-        kegiatan: item.kegiatan,
-      }));
+
+      const fetchedReports = response.data.data
+        .filter((item) => item.nim === lastStb) // Filter data berdasarkan nim
+        .map((item) => ({
+          id: item.id,
+          kegiatan: item.kegiatan,
+          tgl: item.tgl, // Asumsi tanggal ada dalam format string ISO
+        }))
+        .sort((a, b) => new Date(b.tgl) - new Date(a.tgl)); // Urutkan berdasarkan tanggal terbaru
+
       setReports(fetchedReports);
     } catch (error) {
       console.error("Error fetching reports:", error);
@@ -98,6 +107,7 @@ export default function LaporanScreen({ route }) {
 
       if (distance <= 3000) {
         console.log("Anda berada di dalam jangkauan");
+        // console.log(`Jarak ke lokasi KKL: ${distance.toFixed(2)} meter`);
       } else {
         Alert.alert(
           "Lokasi terlalu jauh",
@@ -132,7 +142,11 @@ export default function LaporanScreen({ route }) {
         dataForApi
       );
       console.log("Laporan berhasil ditambahkan:", res.data);
-      setReports([...reports, dataForApi]);
+      setReports(
+        [dataForApi, ...reports].sort(
+          (a, b) => new Date(b.tgl) - new Date(a.tgl)
+        )
+      );
       setStartTime("");
       setEndTime("");
       setReportContent("");
@@ -179,6 +193,7 @@ export default function LaporanScreen({ route }) {
         renderItem={({ item }) => (
           <View style={styles.reportItem}>
             <Text style={styles.reportText}>Kegiatan: {item.kegiatan}</Text>
+            <Text style={styles.reportText}>Tanggal: {item.tgl}</Text>
           </View>
         )}
       />
@@ -191,13 +206,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: "#f5f5f5",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 16,
-    textAlign: "center",
-    color: "#6200ee",
   },
   inputContainer: {
     marginBottom: 16,
