@@ -9,17 +9,21 @@ import {
   Alert,
   Image,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const { width, height } = Dimensions.get("window");
 
 const LoginScreen = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
   const handleLogin = async () => {
+    setLoading(true); // Mulai loading
     try {
       const res = await axios.get(
         `https://service.undipa.ac.id/mhs.php?user=${username}&pass=${password}&api=071994`
@@ -55,33 +59,58 @@ const LoginScreen = () => {
       }
     } catch (error) {
       Alert.alert("Login Gagal", "Periksa kembali password atau stambuk anda");
+    } finally {
+      setLoading(false); // Selesai loading
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Image source={require("../../assets/undipa.png")} style={styles.logo} />
-      <TextInput
-        style={styles.input}
-        placeholder="Stambuk"
-        value={username}
-        onChangeText={setUsername}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        secureTextEntry
-        onChangeText={setPassword}
-      />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-    </View>
+    <KeyboardAwareScrollView
+      contentContainerStyle={styles.scrollContainer}
+      enableOnAndroid={true}
+      extraHeight={height * 0.1}
+      extraScrollHeight={height * 0.1}
+    >
+      <View style={styles.container}>
+        <Image
+          source={require("../../assets/undipa.png")}
+          style={styles.logo}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Stambuk"
+          value={username}
+          onChangeText={setUsername}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          secureTextEntry
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleLogin}
+          disabled={loading} // Nonaktifkan tombol saat loading
+        >
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" /> // Tampilkan loading spinner
+          ) : (
+            <Text style={styles.buttonText}>Login</Text>
+          )}
+        </TouchableOpacity>
+      </View>
+    </KeyboardAwareScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingVertical: 0,
+  },
   container: {
     flex: 1,
     justifyContent: "center",
@@ -92,7 +121,7 @@ const styles = StyleSheet.create({
     width: width * 0.4,
     height: width * 0.4,
     alignSelf: "center",
-    marginBottom: height * 0.05,
+    marginBottom: width * 0.05,
     marginTop: height * -0.05,
   },
   input: {

@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   },
   reportItem: {
     padding: 16,
-    borderBottomWidth: 1,
+    // borderBottomWidth: 1,
     borderBottomColor: "#ccc",
     backgroundColor: "#fff",
     borderRadius: 8,
